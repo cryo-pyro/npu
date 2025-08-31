@@ -251,7 +251,7 @@ Alright—here’s a crisp, **actionable plan** that always ends in a **Flask ap
 
 ---
 
-# 0) High-level shape
+## 0) High-level shape
 
 * **Philosophy:** Play → Parameterize → Simulate → Witness → Update (θ → h(t) → S(t) → Δ → θ′).
 * **Surface:** A **Flask** app that reads a **client pack** (config + data), renders dashboards, games, and simulators.
@@ -260,7 +260,7 @@ Alright—here’s a crisp, **actionable plan** that always ends in a **Flask ap
 
 ---
 
-# 1) Repo layout (mono-repo, plug-in twin per client)
+## 1) Repo layout (mono-repo, plug-in twin per client)
 
 ```
 ukb-twin/
@@ -305,9 +305,9 @@ ukb-twin/
 
 ---
 
-# 2) Client pack = one file + one folder
+## 2) Client pack = one file + one folder
 
-## `config/clients/ukubona.yml`
+### `config/clients/ukubona.yml`
 
 ```yaml
 client_id: ukubona
@@ -339,7 +339,7 @@ costs:
   co2_per_kwh_kg: 0.35
 ```
 
-## `data/ukubona/` schema (CSV headers)
+### `data/ukubona/` schema (CSV headers)
 
 * `personnel.csv`: `person_id,name,role,department,access_level,salary,status`
 * `tasks.csv`: `task_id,title,person_id,temporal_scale,status,priority,red_flag,due_date`
@@ -350,9 +350,9 @@ costs:
 
 ---
 
-# 3) Flask blueprint contract (always ends in Flask)
+## 3) Flask blueprint contract (always ends in Flask)
 
-### Routes (all clients share these, gated by config)
+#### Routes (all clients share these, gated by config)
 
 * `/` → dashboard (metrics grid, DAG, charts)
 * `/personnel` → directory + filters + payroll tally
@@ -362,7 +362,7 @@ costs:
 * `/game` → **Game of Care** (play-first simulator page)
 * `/api/*` → JSON services (hazard, survival, energy estimates, freestyle fills)
 
-### `app.py` sketch (essentials)
+#### `app.py` sketch (essentials)
 
 ```python
 from flask import Flask, render_template, g
@@ -396,7 +396,7 @@ def personnel():
 
 ---
 
-# 4) “Play” is first-class (no PDFs)
+## 4) “Play” is first-class (no PDFs)
 
 * **Game of Care** page provides **avatars**, **branching steps**, and **clinic chat simulator** (you already have this scaffold).
 * The “Play” button can call `/api/hazard` & `/api/survival` to show **parallel futures**:
@@ -407,7 +407,7 @@ def personnel():
 
 ---
 
-# 5) Energy & dollars pane (on every page)
+## 5) Energy & dollars pane (on every page)
 
 Right-side floating mini-panel:
 
@@ -424,7 +424,7 @@ This session (last 15 min): 0.21 kWh / $0.038 / 0.07 kg CO₂
 
 ---
 
-# 6) Default generators (“freestyle where data lacks”)
+## 6) Default generators (“freestyle where data lacks”)
 
 In `plugins/freestyle/`:
 
@@ -437,7 +437,7 @@ All generators accept a **seed** to be deterministic for demos (`?seed=ukubona`)
 
 ---
 
-# 7) The pentads → UI knobs (your A/B/C mapping as toggles)
+## 7) The pentads → UI knobs (your A/B/C mapping as toggles)
 
 * **Neuron pentad** maps to **time scales** & **persona voice** in the game (Faith/Despair/Ideology/Ops/Recursion).
 * **Tree pentad** maps to **page sections** (Root physics → Energy pane; Canopy → charts; Fruit → Δ shown as residuals).
@@ -447,7 +447,7 @@ All generators accept a **seed** to be deterministic for demos (`?seed=ukubona`)
 
 ---
 
-# 8) Deployment (Render.com)
+## 8) Deployment (Render.com)
 
 `render.yaml`:
 
@@ -470,7 +470,7 @@ Switch client at deploy time (`CLIENT_ID=acme-health`) or per subpath/domain if 
 
 ---
 
-# 9) Onboarding workflow (for any client—including Ukubona)
+## 9) Onboarding workflow (for any client—including Ukubona)
 
 1. **Brand** (logo\_light/dark, favicons) → paste links in `client.yml`.
 2. **Data** (drop their CSVs; or none—freestyle will fill).
@@ -483,7 +483,7 @@ Switch client at deploy time (`CLIENT_ID=acme-health`) or per subpath/domain if 
 
 ---
 
-# 10) Guardrails (legal + UX)
+## 10) Guardrails (legal + UX)
 
 * **Sim ≠ advice** chorus in footer.
 * **Compute costs are estimates**—clearly labeled.
@@ -491,7 +491,7 @@ Switch client at deploy time (`CLIENT_ID=acme-health`) or per subpath/domain if 
 
 ---
 
-# 11) What you can update (the “knobs”)
+## 11) What you can update (the “knobs”)
 
 * **Brand**: theme, logo, favicon (already working with light/dark).
 * **Data**: personnel, tasks, events, updates.
@@ -503,7 +503,7 @@ All without changing routes—just `client.yml` + CSVs (+ optional plug-ins).
 
 ---
 
-# 12) Minimal client pack you can ship today (Ukubona LLC)
+## 12) Minimal client pack you can ship today (Ukubona LLC)
 
 * `config/clients/ukubona.yml` (above).
 * `data/ukubona/` (the CSVs you already have).
@@ -512,7 +512,7 @@ All without changing routes—just `client.yml` + CSVs (+ optional plug-ins).
 
 ---
 
-# 13) Optional: “Enterprise Simulation” as a distinct tree in the forest
+## 13) Optional: “Enterprise Simulation” as a distinct tree in the forest
 
 Keep your current enterprise sim as **one tree**:
 
@@ -525,7 +525,7 @@ Keep your current enterprise sim as **one tree**:
 
 ---
 
-# 14) What “redeems study” (Heraclitus → Nietzsche → Aeschylus → Ukubona)
+## 14) What “redeems study” (Heraclitus → Nietzsche → Aeschylus → Ukubona)
 
 * **We replace reading with rehearsal.**
 * **We replace PDFs with branching play.**
