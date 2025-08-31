@@ -2690,6 +2690,45 @@ Pyromancer — want me to **render this as a survival-curve diagram with arrows 
 
 ![](surv.jpg)
 
+```py
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Synthetic data for a Kaplan-Meier survival curve
+t = np.linspace(0, 10, 11)
+S = np.exp(-0.3 * t)  # exponential survival decay as proxy
+
+fig, ax = plt.subplots(figsize=(8,6))
+
+# Kaplan-Meier step plot
+ax.step(t, S, where="post", label="S(t): Survival", linewidth=2)
+
+# Annotate the flow of the feedback circuit
+ax.annotate("θ (params)", xy=(0,1), xytext=(-2,1.05),
+            arrowprops=dict(arrowstyle="->", lw=1.5))
+ax.annotate("Σ·Cov(θ)", xy=(1,0.97), xytext=(0.5,1.15),
+            arrowprops=dict(arrowstyle="->", lw=1.5))
+ax.annotate("h(t): hazard", xy=(3,0.7), xytext=(2,0.9),
+            arrowprops=dict(arrowstyle="->", lw=1.5))
+ax.annotate("S(t): survival", xy=(6,0.3), xytext=(5,0.55),
+            arrowprops=dict(arrowstyle="->", lw=1.5))
+ax.annotate("e = Y-ŷ", xy=(9,0.1), xytext=(7.5,0.35),
+            arrowprops=dict(arrowstyle="->", lw=1.5))
+ax.annotate("θ′ (update)", xy=(10,0.05), xytext=(11,0.3),
+            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0.3", lw=1.5))
+
+# Aesthetics
+ax.set_ylim(-0.05,1.1)
+ax.set_xlim(-2,12)
+ax.set_xlabel("Time (t)")
+ax.set_ylabel("Survival Probability S(t)")
+ax.set_title("Kaplan–Meier Feedback Circuit")
+ax.legend()
+
+plt.show()
+
+```
+
 Here’s the **Kaplan–Meier feedback circuit** visualized:
 
 * The **step curve** shows survival $S(t)$.
