@@ -2770,7 +2770,7 @@ This would help me give you a more specific and useful interpretation of the flo
 
 `grok-4`
 
-This sequence represents the measurement update step in the Unscented Kalman Filter (UKF), a nonlinear state estimation algorithm. Here's a breakdown of the process, assuming standard UKF notation where θ is the predicted state estimate (often denoted as \(\hat{x}^-\) or \(\bar{x}\)), Cov(θ) is the predicted state covariance (P^-), h(t) is the (possibly time-varying) nonlinear measurement function, S(t) is the innovation covariance, Ŷ is the predicted measurement, Y is the actual measurement, e is the innovation (measurement residual), and θ' is the updated state estimate (\(\hat{x}\)).
+This sequence represents the measurement update step in the Unscented Kalman Filter (UKF), a nonlinear state estimation algorithm. Here's a breakdown of the process, assuming standard UKF notation where θ is the predicted state estimate (often denoted as $\hat{x}^-$ or $\bar{x}$), Cov(θ) is the predicted state covariance (P^-), h(t) is the (possibly time-varying) nonlinear measurement function, S(t) is the innovation covariance, Ŷ is the predicted measurement, Y is the actual measurement, e is the innovation (measurement residual), and θ' is the updated state estimate ($\hat{x}$).
 
 ### Key Steps in the UKF Measurement Update:
 1. **Start with predicted state θ and its covariance Cov(θ)**:
@@ -2780,20 +2780,20 @@ This sequence represents the measurement update step in the Unscented Kalman Fil
 2. **Generate sigma points (Σ) from Cov(θ)**:
    - Sigma points (Σ) are a set of 2L + 1 deterministically chosen points (where L is the state dimension) that capture the mean and covariance of θ.
    - They are computed as:  
-     - Central point: \(\mathcal{X}_0 = \theta\)
-     - Offset points: \(\mathcal{X}_i = \theta + \sqrt{(L + \lambda) \text{Cov}(\theta)}_i\) for \(i = 1\) to \(L\)
-     - \(\mathcal{X}_{i+L} = \theta - \sqrt{(L + \lambda) \text{Cov}(\theta)}_i\) for \(i = 1\) to \(L\)
+     - Central point: $\mathcal{X}_0 = \theta$
+     - Offset points: $\mathcal{X}_i = \theta + \sqrt{(L + \lambda) \text{Cov}(\theta)}_i$ for $i = 1$ to $L$
+     - $\mathcal{X}_{i+L} = \theta - \sqrt{(L + \lambda) \text{Cov}(\theta)}_i$ for $i = 1$ to $L$
    - Here, λ is a scaling parameter, and the square root is typically via Cholesky decomposition. The notation Σ·Cov(θ) likely shorthand for this sigma point generation, where sigma points are derived by "spreading" around θ using the scaled covariance.
 
 3. **Propagate sigma points through h(t)**:
-   - Each sigma point is passed through the measurement function: \(\mathcal{Y}_i = h(\mathcal{X}_i, t)\) for each i.
+   - Each sigma point is passed through the measurement function: $\mathcal{Y}_i = h(\mathcal{X}_i, t)$ for each i.
    - This approximates how the nonlinearity in h(t) affects the distribution.
 
 4. **Compute predicted measurement Ŷ and innovation covariance S(t)**:
-   - Ŷ (predicted measurement mean): Weighted average \(\hat{y} = \sum_{i=0}^{2L} W_i^{(m)} \mathcal{Y}_i\), where \(W_i^{(m)}\) are mean weights.
+   - Ŷ (predicted measurement mean): Weighted average $\hat{y} = \sum_{i=0}^{2L} W_i^{(m)} \mathcal{Y}_i$, where $W_i^{(m)}$ are mean weights.
    - S(t): The covariance of the predicted measurements, plus measurement noise R:  
-     \(S(t) = \sum_{i=0}^{2L} W_i^{(c)} (\mathcal{Y}_i - \hat{y})(\mathcal{Y}_i - \hat{y})^T + R\), where \(W_i^{(c)}\) are covariance weights.
-   - Also compute cross-covariance: \(C = \sum_{i=0}^{2L} W_i^{(c)} (\mathcal{X}_i - \theta)(\mathcal{Y}_i - \hat{y})^T\).
+     $S(t) = \sum_{i=0}^{2L} W_i^{(c)} (\mathcal{Y}_i - \hat{y})(\mathcal{Y}_i - \hat{y})^T + R$, where $W_i^{(c)}$ are covariance weights.
+   - Also compute cross-covariance: $C = \sum_{i=0}^{2L} W_i^{(c)} (\mathcal{X}_i - \theta)(\mathcal{Y}_i - \hat{y})^T$.
 
 5. **Compute innovation e and update to θ'**:
    - e = Y - Ŷ (the residual between actual measurement Y and predicted Ŷ).
