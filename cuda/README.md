@@ -2893,14 +2893,17 @@ This is ukubona in a nutshell. we want to summon the ghosts of the dead, in all 
 
    * In your feedback circuit:
 
-  $$ θ \to h(t) \to S(t) \to e \to θ′ $$
+$$
+\theta \to \Sigma_{\text{cov}(\theta)} \to h(t) \to S(t) \to e \to \theta'
+$$
 
 Where:
-- `θ` - Initial parameter/state
-- `h(t)` - Hidden state function over time
-- `S(t)` - State transformation function
-- `e` - Error/encoding step
-- `θ′` - Updated parameter/final state
+- `θ` — Initial parameter / state  
+- `Σ.cov(θ)` — Uncertainty  
+- `h(t)` — Hidden state function over time  
+- `S(t)` — State transformation function  
+- `e` — Error / encoding step; `θ′` — Updated parameter / final state  
+
 
 
 **the **ghosts are embedded in the residuals (e)**.
