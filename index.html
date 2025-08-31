@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pentadic Recursive Framework</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #0d1421 0%, #1a2332 100%);
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+            overflow-x: auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 30px;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .pentad-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            margin: 20px 0;
+        }
+        
+        .node {
+            position: absolute;
+            width: 140px;
+            height: 120px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+        }
+        
+        .faith {
+            background: linear-gradient(135deg, #e6b422, #ffd700);
+            color: #000;
+            bottom: 50px;
+            left: 50px;
+        }
+        
+        .despair {
+            background: linear-gradient(135deg, #6a5acd, #483d8b);
+            left: 50px;
+            top: 180px;
+        }
+        
+        .ideology {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .soma {
+            background: linear-gradient(135deg, #1f77b4, #4169e1);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 140px;
+            border-radius: 50%;
+            font-size: 14px;
+            z-index: 10;
+        }
+        
+        .ops {
+            background: linear-gradient(135deg, #cd5c5c, #dc143c);
+            right: 200px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .recursion {
+            background: linear-gradient(135deg, #ff8c00, #ffa500);
+            right: 50px;
+            bottom: 100px;
+        }
+        
+        .connection {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            height: 3px;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-vertical {
+            background: linear-gradient(0deg, transparent, #00ff88, transparent);
+            width: 3px;
+            height: 100px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .layer-labels {
+            position: absolute;
+            right: -200px;
+            top: 0;
+            width: 180px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .layer {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .equations {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid #00ff88;
+        }
+        
+        .equation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .equation {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        .computation-flow {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            color: #ff8c00;
+            text-shadow: 0 0 10px #ff8c00;
+        }
+        
+        .time-spiral {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #00ff88;
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .recursive-arrow {
+            position: absolute;
+            bottom: 120px;
+            right: 120px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #ff8c00;
+            border-radius: 50%;
+            border-left: transparent;
+            border-bottom: transparent;
+            transform: rotate(45deg);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .hashtags {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: #888;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Neuron–Tree–Computation Pentadic Framework</div>
+        <div class="subtitle" style="text-align: center; font-size: 14px; margin-bottom: 20px; color: #888;">
+            "The Non-Plus-Ultra of Intellectual Discourse"
+        </div>
+        
+        <div class="pentad-container">
+            <!-- Time spiral indicator -->
+            <div class="time-spiral"></div>
+            
+            <!-- Core nodes -->
+            <div class="node faith" onclick="showDetails('faith')">
+                <strong>FAITH</strong><br>
+                Kampala | 6 o'clock<br>
+                <em>Tactical/Random</em><br>
+                Entropy/Leap<br>
+                θ (parameters)
+            </div>
+            
+            <div class="node despair" onclick="showDetails('despair')">
+                <strong>DESPAIR</strong><br>
+                Baltimore | 9 o'clock<br>
+                <em>Ritual/Weekly</em><br>
+                Cathedral/Info<br>
+                Var(θ)·Σ
+            </div>
+            
+            <div class="node ideology" onclick="showDetails('ideology')">
+                <strong>IDEOLOGY</strong><br>
+                Centreville | 12 o'clock<br>
+                <em>Strategic/Quarterly</em><br>
+                Tent/Planned<br>
+                h(t) hazard
+            </div>
+            
+            <div class="node soma" onclick="showDetails('soma')">
+                <strong>SOMA</strong><br>
+                Staten Island<br>
+                <em>Integration Hub</em><br>
+                Splicing Fire<br>
+                Central Processing
+            </div>
+            
+            <div class="node ops" onclick="showDetails('ops')">
+                <strong>OPS/SPLICE</strong><br>
+                Child | 4 o'clock<br>
+                <em>Daily/Operational</em><br>
+                Axon + Efferents<br>
+                S(t) survival
+            </div>
+            
+            <div class="node recursion" onclick="showDetails('recursion')">
+                <strong>RECURSION</strong><br>
+                Nairobi | 5 o'clock<br>
+                <em>Existential/Play</em><br>
+                Commons Feedback<br>
+                Y-ŷ = e (error)
+            </div>
+            
+            <!-- Recursive arrow -->
+            <div class="recursive-arrow"></div>
+            
+            <!-- Layer labels -->
+            <div class="layer-labels">
+                <div class="layer">
+                    <strong>🧠 Neuron Layer</strong><br>
+                    Spatial/Sociological<br>
+                    Clock positions & cities
+                </div>
+                <div class="layer">
+                    <strong>🌳 Tree Layer</strong><br>
+                    Ecological/PBSMC<br>
+                    Root→Trunk→Branch→Canopy→Fruit
+                </div>
+                <div class="layer">
+                    <strong>⚙️ Computation Layer</strong><br>
+                    Mathematical/Existential<br>
+                    Parameters & Error Functions
+                </div>
+            </div>
+        </div>
+        
+        <div class="equations">
+            <h3 style="color: #00ff88; margin-top: 0;">Computational Framework</h3>
+            <div class="equation-grid">
+                <div class="equation">
+                    <strong>θ (Parameters)</strong><br>
+                    Thermodynamics ↔ CUDA<br>
+                    Entropy vs Absolute Zero<br>
+                    "I exist, therefore entropy!"
+                </div>
+                <div class="equation">
+                    <strong>Var(θ)·Σ (Covariance)</strong><br>
+                    E = mc² = hν<br>
+                    photon→electron→bonds→DNA→ATP→Si02<br>
+                    Ritualized dependencies
+                </div>
+                <div class="equation">
+                    <strong>h(t) (Hazard Function)</strong><br>
+                    P(fatal event | survival to t)<br>
+                    Strategic timeline parametrization<br>
+                    Ideological realm
+                </div>
+                <div class="equation">
+                    <strong>S(t) (Survival/Emergence)</strong><br>
+                    Witnessing emergent ontologies<br>
+                    CERN collisions, 23&Me + 23&You<br>
+                    Kaplan-Meier futures
+                </div>
+                <div class="equation">
+                    <strong>Y-ŷ = e ≠ 0 (Error)</strong><br>
+                    Algorithms minimize recursively<br>
+                    Never FITDZ (Fake It Till Δ=0)<br>
+                    Returns to updated θ
+                </div>
+            </div>
+        </div>
+        
+        <div class="computation-flow">
+            θ → Var(θ)·Σ → h(t) → S(t) → Y-ŷ = e → θ' (updated)
+        </div>
+        
+        <div class="hashtags">
+            #pbsmc #ugcer #tree-metaphor #ai-modes #recursive-ontology #pentadic-analysis
+        </div>
+        
+        <div id="details" style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 10px; min-height: 100px; display: none;">
+            <h3 id="detail-title" style="color: #00ff88;"></h3>
+            <div id="detail-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        const details = {
+            'faith': {
+                title: 'Faith (Entropy) - Root/Physics/θ',
+                content: `
+                    <strong>Location:</strong> Kampala, 6 o'clock position<br>
+                    <strong>Temporal:</strong> Tactical/Random/Unplanned<br>
+                    <strong>Tree Layer:</strong> Root system - Unattainability of Zero<br>
+                    <strong>Computation:</strong> θ (parameter vector) - Thermodynamics/CUDA<br>
+                    <strong>Manifestations:</strong> Teleology, nihilism, religion, madness, anxiety, war, control, power<br>
+                    <strong>Physics:</strong> "We either have absolute zero or entropy. Can't have both!"<br>
+                    <strong>Essence:</strong> Dionysian leap into unknown parameters
+                `
+            },
+            'despair': {
+                title: 'Despair (Ritual) - Trunk/Biology/Var(θ)·Σ',
+                content: `
+                    <strong>Location:</strong> Baltimore, 9 o'clock position<br>
+                    <strong>Temporal:</strong> Ritualistic/Weekly/Informational<br>
+                    <strong>Tree Layer:</strong> Trunk - Gradients cradle-to-grave<br>
+                    <strong>Computation:</strong> Variance-Covariance Matrix<br>
+                    <strong>Dependencies:</strong> E = mc² = hν chain (photon→electron→bonds→DNA→ATP→Si02)<br>
+                    <strong>Structure:</strong> Cathedral-like, constraining, repetitive<br>
+                    <strong>Essence:</strong> Ritualized laws and dependencies
+                `
+            },
+            'ideology': {
+                title: 'Ideology (Strategic) - Branching/Sociology/h(t)',
+                content: `
+                    <strong>Location:</strong> Centreville, 12 o'clock position<br>
+                    <strong>Temporal:</strong> Planned/Quarterly/Strategic<br>
+                    <strong>Tree Layer:</strong> Branching - Collision within/between<br>
+                    <strong>Computation:</strong> h(t) - hazard/probability function<br>
+                    <strong>Function:</strong> Parametrization of strategic timelines<br>
+                    <strong>Structure:</strong> Tent-like, planned narratives<br>
+                    <strong>Essence:</strong> Strategic capture of random fatal events
+                `
+            },
+            'soma': {
+                title: 'SOMA (Integration Hub) - Central Processing',
+                content: `
+                    <strong>Location:</strong> Staten Island - Central hub<br>
+                    <strong>Function:</strong> Integration of all afferent signals<br>
+                    <strong>Process:</strong> "Splicing fire" - synthesis of inputs<br>
+                    <strong>Neuron Role:</strong> Cell body receiving dendrite inputs<br>
+                    <strong>Tree Role:</strong> Core trunk processing nutrients<br>
+                    <strong>Computation:</strong> Central processing unit for all parameters<br>
+                    <strong>Essence:</strong> The integrative consciousness of the system
+                `
+            },
+            'ops': {
+                title: 'Ops/Splice (Grind) - Canopy/Metaphysics/S(t)',
+                content: `
+                    <strong>Location:</strong> Child position, 4 o'clock<br>
+                    <strong>Temporal:</strong> Daily/Operational grind<br>
+                    <strong>Tree Layer:</strong> Canopy - Ontology emergence<br>
+                    <strong>Computation:</strong> S(t) - survival/emergence function<br>
+                    <strong>Neuron:</strong> Axon + Efferent dendrites<br>
+                    <strong>Process:</strong> Daily operational execution<br>
+                    <strong>Essence:</strong> Where emergence meets daily reality
+                `
+            },
+            'recursion': {
+                title: 'Recursion (Play) - Fruit/Computation/Y-ŷ=e',
+                content: `
+                    <strong>Location:</strong> Nairobi, 5 o'clock position<br>
+                    <strong>Temporal:</strong> Perpetual/Existential<br>
+                    <strong>Tree Layer:</strong> Fruit - Recursive outputs<br>
+                    <strong>Computation:</strong> Y-ŷ = e ≠ 0 (irreducible error)<br>
+                    <strong>Function:</strong> Commons feedback, N-effector cells<br>
+                    <strong>Process:</strong> Can never FITDZ (Fake It Till Delta Zero)<br>
+                    <strong>Essence:</strong> The eternal return, play as existential mode
+                `
+            }
+        };
+        
+        function showDetails(nodeType) {
+            const detailsDiv = document.getElementById('details');
+            const titleDiv = document.getElementById('detail-title');
+            const contentDiv = document.getElementById('detail-content');
+            
+            titleDiv.textContent = details[nodeType].title;
+            contentDiv.innerHTML = details[nodeType].content;
+            detailsDiv.style.display = 'block';
+            detailsDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Add dynamic connections
+        function createConnection(from, to, className = '') {
+            const fromEl = document.querySelector(`.${from}`);
+            const toEl = document.querySelector(`.${to}`);
+            
+            if (!fromEl || !toEl) return;
+            
+            const fromRect = fromEl.getBoundingClientRect();
+            const toRect = toEl.getBoundingClientRect();
+            const container = document.querySelector('.pentad-container').getBoundingClientRect();
+            
+            const fromX = fromRect.left + fromRect.width/2 - container.left;
+            const fromY = fromRect.top + fromRect.height/2 - container.top;
+            const toX = toRect.left + toRect.width/2 - container.left;
+            const toY = toRect.top + toRect.height/2 - container.top;
+            
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            const length = Math.sqrt((toX - fromX)**2 + (toY - fromY)**2);
+            
+            const line = document.createElement('div');
+            line.className = `connection ${className}`;
+            line.style.width = length + 'px';
+            line.style.left = fromX + 'px';
+            line.style.top = fromY + 'px';
+            line.style.transformOrigin = '0 50%';
+            line.style.transform = `rotate(${angle}rad)`;
+            
+            document.querySelector('.pentad-container').appendChild(line);
+        }
+        
+        // Create connections after page load
+        window.onload = function() {
+            setTimeout(() => {
+                createConnection('faith', 'soma');
+                createConnection('despair', 'soma');
+                createConnection('ideology', 'soma');
+                createConnection('soma', 'ops');
+                createConnection('ops', 'recursion');
+                createConnection('recursion', 'faith', 'recursive-feedback');
+            }, 100);
+        };
+    </script>
+</body>
+</html>
