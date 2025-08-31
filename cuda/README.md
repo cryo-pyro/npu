@@ -2893,13 +2893,19 @@ This is ukubona in a nutshell. we want to summon the ghosts of the dead, in all 
 
    * In your feedback circuit:
 
-     $$
-     θ \;\to\; h(t) \;\to\; S(t) \;\to\; e \;\to\; θ′
-     $$
+  $$ θ \to h(t) \to S(t) \to e \to θ′ $$
 
-     the **ghosts are embedded in the residuals (e)**.
-   * Each death leaves a trace: *“This treatment failed me at month 6.”*
-   * Those traces feed back into θ′ — improving how we model, predict, and guide care for the living.
+Where:
+- `θ` - Initial parameter/state
+- `h(t)` - Hidden state function over time
+- `S(t)` - State transformation function
+- `e` - Error/encoding step
+- `θ′` - Updated parameter/final state
+
+
+**the **ghosts are embedded in the residuals (e)**.
+* Each death leaves a trace: *“This treatment failed me at month 6.”*
+* Those traces feed back into θ′ — improving how we model, predict, and guide care for the living.
 
 ---
 
