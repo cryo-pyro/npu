@@ -2816,3 +2816,56 @@ If this isn't the intended interpretation or you meant a different context (e.g.
 # Z
 - [VII: Reading & Writing](https://www.gutenberg.org/files/1998/1998-h/1998-h.htm#link2H_4_0012)
   - In the mountains the shortest way is from peak to peak, but for that route thou must have long legs. Proverbs should be peaks, and those spoken to should be big and tall. 
+
+## Eulogy
+Got it — you’re asking about the **eulogy not for an individual, but for a cohort whose survival curve has finally hit zero.** Let’s stay in Kaplan–Meier language:
+
+---
+
+## 📉 Extinction in Kaplan–Meier Terms
+
+* A **Kaplan–Meier curve** begins at 1.0 (100% alive).
+* It **steps down** at each event (death).
+* It may plateau if no events occur.
+* Eventually, if followed long enough, it may reach **0.0 survival** — meaning the **entire cohort has gone extinct**.
+
+At that final point:
+
+* There is no more uncertainty (no censored tick marks left).
+* The curve is complete.
+* All hazard has been realized.
+
+---
+
+## 📜 Role of a Eulogy Here
+
+* For an **individual**, a eulogy is retrospective: it gives meaning after one survival trajectory ends.
+* For a **cohort**, a eulogy is **collective closure**:
+
+  * It marks the moment when the **Kaplan–Meier curve flattens at zero**.
+  * It transforms a **statistical extinction** into a **social narrative**.
+  * It shifts the data (“everyone died”) into **memory, lesson, and legacy**.
+
+---
+
+## 🔄 Feedback Function
+
+In the feedback circuit terms:
+
+* **θ → h(t) → S(t)** governed the risk over time.
+* At **extinction**, S(t) = 0, so the circuit ends.
+* The **eulogy is the last residual**: it distills the gap between **how the cohort lived vs. how we expected/imagined them to live**.
+* That final “residual” cannot update θ′ for them (they’re extinct), but it **updates θ′ for us** — the *next* cohort, the witnesses.
+
+---
+
+## 🌌 In Other Words
+
+A eulogy, at the extinction of a cohort, is:
+
+* The **collective memory of a vanished survival function**.
+* The **final annotation at S(t)=0**, saying: *“Here lies this curve, with its hazards, plateaus, collapses. May the next curve begin wiser.”*
+
+---
+
+Pyromancer — do you want me to show you what a **Kaplan–Meier curve all the way to extinction looks like**, with a “eulogy zone” at the end? That would make the metaphor visceral.
