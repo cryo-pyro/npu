@@ -1614,5 +1614,924 @@ Keep using **`eden.sh`** locally for rapid spins (it can call `forest.sh` under 
 If you want, I can hand you **LRU caching** for configs/data and a tiny **Basic Auth** middleware for private pilots — both are 8–10 lines each.
 
 # P
+Yes. The split you’re seeing is clean:
+
+* **Plant intelligence** = intelligence that **creates ecosystems** (closed loops, renewal, recursion, surplus). It’s slow, frugal, and compositional. It *grows* intelligence by feeding other nodes.
+* **Animal intelligence** = intelligence that **creates systems** (open loops, extraction, overdrive). It’s fast, hungry, and instrumental. It *consumes* intelligence by burning resources.
+
+The difference isn’t “who’s smarter,” it’s **energy at stake + recursion depth**. Plant-mode compounds; animal-mode depletes. Most human/enterprise “intelligence” imitates animals — spectacular outputs, low recursion, ecosystem debt.
+
+Let’s wire this into the twin so it’s not just a metaphor.
+
+# Map it to your Flask twin
+
+## 1) Two operating modes (per client, per scenario)
+
+* **mode.plant** → “ecosystem intelligence”
+
+  * Budgeted energy (kWh), **recycled fraction** (r), **lagged benefits** (L), **diversity** (D).
+  * Penalty for breaking cycles; credit for closing loops.
+* **mode.animal** → “system intelligence”
+
+  * Peak power (kW), **throughput** (T), **time-to-output** (τ), **leakage** (ℓ).
+  * Credit for short-term output; penalty for ecological drawdown.
+
+### Example: `config/clients/<client>.yml`
+
+```yaml
+intelligence:
+  mode: plant         # plant | animal | hybrid
+  plant:
+    energy_budget_kwh: 100.0
+    recycle_ratio: 0.35         # r: share of waste/heat reinvested
+    diversity_index_min: 0.45   # D: Simpson/Shannon proxy
+    lag_benefit_days: 60        # L: delayed gains allowed
+  animal:
+    peak_power_kw: 50.0
+    throughput_target: 1_000    # ops/day
+    leakage_penalty: 0.15       # ℓ: proportion unrecouped
+    time_to_output_days: 7      # τ
+```
+
+## 2) A second curve next to Kaplan–Meier
+
+You already plot **S(t)** (survival). Add **R(t)** (resource viability) and **E(t)** (ecosystem index). Plant-mode aims to keep **S(t)** high **and** **R(t), E(t)** above threshold; animal-mode often boosts **S(t)** short-term at the cost of **R(t), E(t)**.
+
+* **S(t):** patient/system survival (you have).
+* **R(t):** resource survivorship (energy/material capital).
+* **E(t):** ecosystemicity (recursion & renewal score).
+
+Plot them stacked or side-by-side: **Scenario vs Counterfactual** for all three.
+
+## 3) Ecosystemicity score (single number)
+
+Define **Ξ** for a session/branch:
+
+```
+Ξ = α·A + β·P + γ·C
+where
+A = Average recursion depth achieved (shared dependencies resolved, closed loops)
+P = Proportion of energy recycled (r)
+C = Diversity-weighted connectivity (D × number of distinct links used)
+Constraints: energy budget, lag allowance (L)
+```
+
+Tune α, β, γ in config. Show Ξ as a badge next to \$/kWh/CO₂.
+
+## 4) UI knobs (make the philosophy tactile)
+
+* Toggle: **Plant ↔ Animal ↔ Hybrid** (switches budget/penalty regimes).
+* Slider: **Recycle ratio** and **Leakage penalty** (live recompute R(t), E(t)).
+* Switch: **Lag benefits allowed** (displays “patient” strategies).
+* Diversity meter: **D** (warns when a plan narrows pathways).
+
+## 5) Costs pane becomes a frontier, not a meter
+
+Right now you show **kWh / \$ / CO₂**. Add the **frontier**:
+
+* **Animal frontier**: maximize short-term S(t) given energy E.
+* **Plant frontier**: maximize S(t) subject to **R(t), E(t) ≥ thresholds** and **Ξ↑**.
+
+Display which frontier the user’s current choices sit on (or inside).
+
+## 6) Gameplay translation
+
+* **Plant round**: fewer immediate rewards; buffs for loop-closure and delayed payoffs. “Return in 60 days” buttons become *attractive*, not punishments.
+* **Animal round**: big instant wins; visible ecosystem debt. The debt follows you into later rounds (R(t), E(t) sag).
+
+## 7) Minimal math you can ship now
+
+* **R(t)** via a simple stock-flow:
+
+  ```
+  R_{t+1} = R_t + influx - (consumption - r·waste)
+  normalize to [0,1]
+  ```
+* **E(t)** via normalized Ξ on a rolling window.
+* Keep **S(t)** as is (KM). You’re not replacing medicine — you’re revealing its **budget & ecology**.
+
+## 8) Pages to add/update
+
+* `/km` → new tabs: **Survival | Resources | Ecosystemicity | Frontier**
+* `/game` → add **mode toggle** and **loop-reward** mechanics (badges for closures).
+* `/energy` → ledger by action: kWh, \$, CO₂, **recycled kWh**, ΔΞ.
+
+## 9) What counts as “plant” in enterprises
+
+* Reuse artifacts (partials, shared models, shared services) → measured loop closures.
+* Compose capabilities instead of cloning teams → recursion depth ↑.
+* Accept lags (delayed benefits) → reduces frantic throughput, increases Ξ.
+* Maintain diversity (alt pathways) → option value ↑, fragility ↓.
+
+**Animal** is the opposite: fork, rush, burn, leak. Spectacular demos, ecosystem debt.
+
+---
+
+# Quick concrete additions (copy/paste)
+
+### A. Config weights (add to client YAML)
+
+```yaml
+ecosystemicity:
+  alpha: 0.4   # recursion depth
+  beta: 0.35   # recycle ratio
+  gamma: 0.25  # diversity-connectivity
+thresholds:
+  R_min: 0.6
+  E_min: 0.6
+```
+
+### B. API to compute R/E/Ξ for current filters
+
+Add `/api/eco`:
+
+```json
+{
+  "client": "ukubona",
+  "filters": {"agent":"A001","space":"clinic","time":"2025Q2"},
+  "R_curve": {"t":[...], "R":[...]},
+  "E_curve": {"t":[...], "E":[...]},
+  "Xi": 0.72,
+  "frontier": "plant"  // "animal" | "inside"
+}
+```
+
+### C. UI badges (every page)
+
+```
+Energy 0.003 kWh | $0.0005 | 0.0011 kg CO₂ | R=0.74 | E=0.69 | Ξ=0.72 (plant frontier)
+```
+
+---
+
+# Why this redeems the study grind
+
+* **Play replaces reading**: users feel the cost of clarity and the reward of loops.
+* **Two modes teach the lesson**: plant vs animal creates immediate tension you can *experience*.
+* **Ecosystems > systems**: the app rewards recursion and renewal; punishes extraction-only wins.
+
+If you want, I’ll give you the exact `/api/eco` Flask stub + a tiny resource stock-flow and Ξ computation so you can ship this today next to `/api/km`.
+
 # Q 
+Let’s ship. Below are **complete, drop-in files** to add **Plant vs Animal intelligence** to your twin with a new **/eco** page and **/api/eco** endpoint. They work with your existing multi-tenant app (path or subdomain clients), reuse your config, and display:
+
+* **R(t)** resource survivorship (stock/flow with recycle ratio)
+* **E(t)** ecosystemicity (recursion/renewal score over time)
+* **Ξ** session ecoscore (single number)
+* **Frontier** classification (plant | animal | inside)
+* Badges next to kWh / \$ / CO₂
+
+---
+
+# 1) `services/eco.py` (new)
+
+```python
+# services/eco.py — Plant vs Animal intelligence metrics for Ukubona twin
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Dict, Any, List, Tuple
+import numpy as np
+import pandas as pd
+
+@dataclass
+class EcoCfg:
+    mode: str = "plant"  # "plant" | "animal" | "hybrid"
+    # plant params
+    energy_budget_kwh: float = 100.0
+    recycle_ratio: float = 0.35    # r
+    diversity_index_min: float = 0.45
+    lag_benefit_days: int = 60     # L
+    # animal params
+    peak_power_kw: float = 50.0
+    throughput_target: float = 1000.0
+    leakage_penalty: float = 0.15  # ℓ
+    time_to_output_days: int = 7   # τ
+    # scoring weights
+    alpha: float = 0.4   # recursion depth (proxy)
+    beta:  float = 0.35  # recycle ratio contribution
+    gamma: float = 0.25  # diversity-connectivity
+    # thresholds
+    R_min: float = 0.6
+    E_min: float = 0.6
+
+def _from_cfg(cfg: Dict[str, Any]) -> EcoCfg:
+    icfg = cfg.get("intelligence", {}) if cfg else {}
+    plant = icfg.get("plant", {})
+    animal = icfg.get("animal", {})
+    eco = cfg.get("ecosystemicity", {})
+    thr = cfg.get("thresholds", {})
+    return EcoCfg(
+        mode=icfg.get("mode","plant"),
+        energy_budget_kwh=float(plant.get("energy_budget_kwh", 100.0)),
+        recycle_ratio=float(plant.get("recycle_ratio", 0.35)),
+        diversity_index_min=float(plant.get("diversity_index_min", 0.45)),
+        lag_benefit_days=int(plant.get("lag_benefit_days", 60)),
+        peak_power_kw=float(animal.get("peak_power_kw", 50.0)),
+        throughput_target=float(animal.get("throughput_target", 1000.0)),
+        leakage_penalty=float(animal.get("leakage_penalty", 0.15)),
+        time_to_output_days=int(animal.get("time_to_output_days", 7)),
+        alpha=float(eco.get("alpha", 0.4)),
+        beta=float(eco.get("beta", 0.35)),
+        gamma=float(eco.get("gamma", 0.25)),
+        R_min=float(thr.get("R_min", 0.6)),
+        E_min=float(thr.get("E_min", 0.6)),
+    )
+
+def _diversity_index(series: pd.Series) -> float:
+    """Simple normalized diversity proxy (Shannon). Returns [0,1]."""
+    if series is None or series.empty:
+        return 0.0
+    p = series.value_counts(normalize=True)
+    H = -(p * np.log(p + 1e-12)).sum()
+    # normalize by log(K)
+    K = max(1, len(p))
+    return float(H / np.log(K + 1e-12))
+
+def compute_resource_curve(
+    timeline_days: List[int],
+    actions_energy_kwh: List[float],
+    cfg: EcoCfg,
+) -> pd.DataFrame:
+    """
+    Simple stock/flow for resource survivorship R(t) in [0,1].
+    R_{t+1} = R_t + influx - (consumption - r*waste)
+    Here we model influx=0 (can be extended); waste approximated as fraction of consumption.
+    """
+    T = max(timeline_days) if timeline_days else 0
+    if T <= 0:
+        return pd.DataFrame({"t":[0], "R":[1.0]})
+    # aggregate daily consumption
+    cons = np.zeros(T+1)
+    for t, e in zip(timeline_days, actions_energy_kwh):
+        if 0 <= t <= T:
+            cons[t] += max(0.0, e)
+
+    R = np.zeros(T+1, dtype=float)
+    R[0] = 1.0
+    r = np.clip(cfg.recycle_ratio, 0.0, 1.0)
+    budget = max(cfg.energy_budget_kwh, 1e-6)
+    for t in range(T):
+        c = cons[t] / budget          # normalize consumption to budget
+        waste = 0.5 * c               # toy waste proxy
+        delta = - (c - r * waste)     # net draw
+        R[t+1] = np.clip(R[t] + delta, 0.0, 1.0)
+
+    return pd.DataFrame({"t": list(range(T+1)), "R": R.tolist()})
+
+def compute_ecoscore_series(
+    timeline_days: List[int],
+    agents: List[str],
+    spaces: List[str],
+    cfg: EcoCfg,
+    recursion_depth_series: List[int] | None = None
+) -> pd.DataFrame:
+    """
+    Ecosystemicity E(t) in [0,1], using Ξ = α·A + β·P + γ·C over time windows:
+    - A: recursion depth proxy (provided or derived from distinct spaces/agents seen)
+    - P: recycle ratio (cfg.recycle_ratio)
+    - C: diversity-connectivity proxy (diversity of spaces * diversity of agents)
+    """
+    if not timeline_days:
+        return pd.DataFrame({"t":[0], "E":[0.0]})
+
+    T = max(timeline_days)
+    E = np.zeros(T+1, dtype=float)
+    # rolling window state
+    seen_agents: List[str] = []
+    seen_spaces: List[str] = []
+    alpha, beta, gamma = cfg.alpha, cfg.beta, cfg.gamma
+    P = np.clip(cfg.recycle_ratio, 0.0, 1.0)
+
+    for t in range(T+1):
+        # accumulate observations at time t (if any)
+        for i, tt in enumerate(timeline_days):
+            if tt == t:
+                if i < len(agents): seen_agents.append(agents[i])
+                if i < len(spaces): seen_spaces.append(spaces[i])
+
+        # recursion depth proxy A
+        if recursion_depth_series and t < len(recursion_depth_series):
+            A = float(recursion_depth_series[t]) / 5.0  # normalize by nominal depth 5
+        else:
+            # proxy with counts of distinct pathways used, normalized
+            A = min(1.0, (len(set(seen_agents)) + len(set(seen_spaces))) / 10.0)
+
+        # connectivity/diversity C
+        Da = _diversity_index(pd.Series(seen_agents)) if seen_agents else 0.0
+        Ds = _diversity_index(pd.Series(seen_spaces)) if seen_spaces else 0.0
+        C = float(Da * Ds)
+
+        Xi = alpha * A + beta * P + gamma * C
+        E[t] = float(np.clip(Xi, 0.0, 1.0))
+
+    return pd.DataFrame({"t": list(range(T+1)), "E": E.tolist()})
+
+def classify_frontier(cfg: EcoCfg, R_last: float, E_last: float) -> str:
+    if R_last >= cfg.R_min and E_last >= cfg.E_min:
+        return "plant"
+    # if below both minima but short-term metrics (not tracked here) are likely high, call animal
+    if R_last < cfg.R_min and E_last < cfg.E_min:
+        return "animal"
+    return "inside"
+
+def ecosession_badges(R_curve: pd.DataFrame, E_curve: pd.DataFrame, cfg: EcoCfg) -> Dict[str, Any]:
+    R_last = float(R_curve["R"].iloc[-1]) if not R_curve.empty else 0.0
+    E_last = float(E_curve["E"].iloc[-1]) if not E_curve.empty else 0.0
+    return {
+        "R": round(R_last, 3),
+        "E": round(E_last, 3),
+        "Xi": round(float(0.5 * (R_last + E_last)), 3),  # simple roll-up for display
+        "frontier": classify_frontier(cfg, R_last, E_last),
+    }
+
+def compute_eco_overlay(
+    cfg_dict: Dict[str, Any],
+    survival_df: pd.DataFrame,
+    filters: Dict[str, str]
+) -> Dict[str, Any]:
+    """Top-level helper used by routes: compute R(t), E(t), badges from filters."""
+    cfg = _from_cfg(cfg_dict)
+    work = survival_df.copy()
+    for k, v in (filters or {}).items():
+        if v and k in work.columns:
+            work = work[work[k].astype(str) == str(v)]
+
+    if work.empty:
+        return {
+            "R_curve": {"t":[0], "R":[1.0]},
+            "E_curve": {"t":[0], "E":[0.0]},
+            "badges": {"R":1.0,"E":0.0,"Xi":0.5,"frontier":"inside"}
+        }
+
+    # Build a toy timeline from durations histogram (days)
+    # Each observation contributes one action at its duration day with unit energy share
+    timeline_days: List[int] = work["duration"].astype(int).clip(lower=0, upper=365).tolist()
+    actions_energy_kwh = [1.0 for _ in timeline_days]   # unit actions; normalized by budget inside
+    agents = work["agent"].astype(str).tolist() if "agent" in work.columns else ["A"]*len(timeline_days)
+    spaces = work["space"].astype(str).tolist() if "space" in work.columns else ["S"]*len(timeline_days)
+
+    R_df = compute_resource_curve(timeline_days, actions_energy_kwh, cfg)
+    E_df = compute_ecoscore_series(timeline_days, agents, spaces, cfg)
+    badges = ecosession_badges(R_df, E_df, cfg)
+    return {
+        "R_curve": {"t": R_df["t"].tolist(), "R": R_df["R"].tolist()},
+        "E_curve": {"t": E_df["t"].tolist(), "E": E_df["E"].tolist()},
+        "badges": badges
+    }
+```
+
+---
+
+# 2) `templates/eco.html` (new)
+
+```html
+{% extends "base.html" %}
+{% block content %}
+<h1>🌿 Ecosystemicity</h1>
+<p>Plant vs Animal intelligence: resource survivorship R(t), ecosystemicity E(t), session ecoscore Ξ, and frontier.</p>
+
+<form method="get" action="" class="card" style="margin:12px 0">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+    <div><label>Agent<br><input name="agent" value="{{ filters.agent or '' }}" placeholder="A001"></label></div>
+    <div><label>Space<br><input name="space" value="{{ filters.space or '' }}" placeholder="clinic/tele/inpatient"></label></div>
+    <div><label>Time<br><input name="time" value="{{ filters.time or '' }}" placeholder="2025Q2"></label></div>
+    <div><button type="submit">Apply</button></div>
+  </div>
+  <p class="badge">Energy {{ cost.kwh }} kWh</p>
+  <p class="badge">${{ cost.usd }}</p>
+  <p class="badge">{{ cost.co2kg }} kg CO₂</p>
+  <p class="badge">R={{ badges.R }}</p>
+  <p class="badge">E={{ badges.E }}</p>
+  <p class="badge">Ξ={{ badges.Xi }}</p>
+  <p class="badge">frontier: {{ badges.frontier }}</p>
+</form>
+
+<div class="grid cols-2">
+  <div class="card">{{ R_plot|safe }}</div>
+  <div class="card">{{ E_plot|safe }}</div>
+</div>
+{% endblock %}
+```
+
+---
+
+# 3) `app.py` (drop-in, multi-tenant, with `/km` and new `/eco`)
+
+> If you already use a multi-tenant `app.py`, you can replace it with this. It includes KM utilities inline (to avoid import tangles) and wires in the eco services above.
+
+```python
+#!/usr/bin/env python3
+from __future__ import annotations
+import os, re, json, yaml
+from pathlib import Path
+from typing import Dict, Any
+import pandas as pd
+import numpy as np
+from flask import Flask, render_template, request, jsonify, g
+
+# ---------- roots / registry ----------
+ROOT = Path(__file__).parent
+REG_PATH = ROOT / "config" / "registry.yml"
+REGISTRY = yaml.safe_load(open(REG_PATH)) if REG_PATH.exists() else {
+    "default_client": "ukubona",
+    "tenants": {"ukubona":{"slug":"ukubona","domains":[]}}
+}
+
+# ---------- ingestion ----------
+def load_client_cfg(slug: str) -> Dict[str, Any]:
+    p = ROOT / "config" / "clients" / f"{slug}.yml"
+    if not p.exists():
+        raise FileNotFoundError(f"Unknown client: {slug}")
+    return yaml.safe_load(open(p))
+
+def ingest_any_csv_folder(slug: str) -> Dict[str, pd.DataFrame]:
+    base = ROOT / "data" / slug
+    out: Dict[str, pd.DataFrame] = {}
+    if not base.exists():
+        return out
+    for name in ["personnel","tasks","calendar","updates","survival"]:
+        f = base / f"{name}.csv"
+        if f.exists():
+            try:
+                out[name] = pd.read_csv(f)
+            except Exception:
+                out[name] = pd.DataFrame()
+    return out
+
+# ---------- tenant resolve ----------
+def resolve_client_from_request():
+    m = re.match(r"^/c/([^/]+)", request.path or "")
+    if m: return m.group(1)
+    host = (request.host or "").split(":")[0].lower()
+    for slug, meta in REGISTRY.get("tenants", {}).items():
+        for d in meta.get("domains", []):
+            if host == d.lower():
+                return slug
+    return REGISTRY.get("default_client","ukubona")
+
+# ---------- KM utilities ----------
+def km_curve(durations: np.ndarray, events: np.ndarray) -> pd.DataFrame:
+    order = np.argsort(durations); t = durations[order]; e = events[order]
+    uniq = np.unique(t); at_risk = len(t); S = 1.0; pts = [(0,1.0)]
+    for ti in uniq:
+        sel = (t == ti); d_i = int(e[sel].sum()); n_i = int(sel.sum())
+        if at_risk > 0: S *= (1.0 - d_i/at_risk)
+        pts.append((int(ti), float(S))); at_risk -= n_i
+    return pd.DataFrame(pts, columns=["t","S"])
+
+def km_overlay(df: pd.DataFrame, group_col="scenario", filters: Dict[str,str] | None = None):
+    wk = df.copy()
+    if filters:
+        for k,v in filters.items():
+            if v and k in wk.columns:
+                wk = wk[wk[k].astype(str)==str(v)]
+    out = {}
+    if wk.empty: return out
+    for label, grp in wk.groupby(group_col) if group_col in wk.columns else [("cohort", wk)]:
+        d = grp["duration"].values if "duration" in grp.columns else grp["time"].values
+        e = grp["event"].values if "event" in grp.columns else np.ones_like(d)
+        curve = km_curve(d.astype(int), e.astype(int))
+        out[str(label)] = {"t": curve["t"].tolist(), "S": curve["S"].tolist(), "n": int(len(grp))}
+    return out
+
+def cost_stamp(cfg: Dict[str, Any], call: str, n_calls: int = 1):
+    costs = cfg.get("costs", {})
+    ek = float(costs.get("energy_kwh_per_call", {}).get(call, 0.0)) * n_calls
+    price = float(costs.get("dollars_per_kwh", 0.18)); co2 = float(costs.get("co2_per_kwh_kg", 0.35))
+    return {"kwh": round(ek,6), "usd": round(ek*price,6), "co2kg": round(ek*co2,6)}
+
+# ---------- eco services ----------
+from services.eco import compute_eco_overlay  # file you added above
+
+def create_app():
+    app = Flask(__name__, template_folder=str(ROOT/"templates"), static_folder=str(ROOT/"static"))
+
+    @app.before_request
+    def _tenant():
+        slug = resolve_client_from_request()
+        g.client_id = slug
+        g.cfg = load_client_cfg(slug)
+        g.brand = g.cfg.get("brand", {})
+        g.data = ingest_any_csv_folder(slug)
+        app.jinja_env.globals["brand"] = g.brand
+
+    @app.get("/")
+    @app.get("/c/<client>")
+    def home(client=None):
+        name = g.cfg.get("name", g.client_id)
+        routes = g.cfg.get("routes", {}).get("enable", ["dashboard","km"])
+        return render_template("base.html", title=f"{name} — Twin", brand=g.brand)\
+        .replace("{% block content %}{% endblock %}", f"""{{% block content %}}
+<h1>👁️ {name} Digital Twin</h1>
+<p class="badge">client_id: <code>{g.client_id}</code></p>
+<p class="badge">routes: {", ".join(routes)}</p>
+<p class="badge">tables: {", ".join(sorted(g.data.keys())) or "freestyled"}</p>
+<p>Try <a href="/km">Kaplan–Meier</a> or <a href="/eco">Ecosystemicity</a>.</p>
+{{% endblock %}}""")
+
+    # ---------- KM page ----------
+    @app.get("/km")
+    @app.get("/c/<client>/km")
+    def km_page(client=None):
+        surv = g.data.get("survival", pd.DataFrame())
+        filt = {"agent": request.args.get("agent",""), "space": request.args.get("space",""), "time_index": request.args.get("time","")}
+        overlay = km_overlay(surv, group_col=("scenario" if "scenario" in surv.columns else None), filters=filt)
+        cst = cost_stamp(g.cfg, "km", 1)
+
+        import plotly.graph_objects as go
+        fig = go.Figure()
+        for label, cur in sorted(overlay.items()):
+            fig.add_trace(go.Scatter(x=cur["t"], y=cur["S"], mode="lines+markers", name=f"{label} (n={cur['n']})"))
+        fig.update_layout(title=f"KM — {g.cfg.get('name', g.client_id)}",
+                          paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+        km_html = fig.to_html(full_html=False, include_plotlyjs="cdn")
+
+        ctrl = f"""
+<form method="get" action="" class="card" style="margin:12px 0">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+    <div><label>Agent<br><input name="agent" value="{filt['agent']}"></label></div>
+    <div><label>Space<br><input name="space" value="{filt['space']}"></label></div>
+    <div><label>Time<br><input name="time" value="{filt['time_index']}"></label></div>
+    <div><button type="submit">Apply</button></div>
+  </div>
+  <p class="badge">Energy {cst['kwh']} kWh</p>
+  <p class="badge">${cst['usd']}</p>
+  <p class="badge">{cst['co2kg']} kg CO₂</p>
+</form>"""
+
+        return render_template("base.html", title="KM", brand=g.brand)\
+          .replace("{% block content %}{% endblock %}",
+          f"""{{% block content %}}
+<h1>📉 Kaplan–Meier Overlay</h1>
+{ctrl}
+<div class="card">{km_html}</div>
+{{% endblock %}}""")
+
+    # ---------- ECO page ----------
+    @app.get("/eco")
+    @app.get("/c/<client>/eco")
+    def eco_page(client=None):
+        surv = g.data.get("survival", pd.DataFrame())
+        filt = {"agent": request.args.get("agent",""), "space": request.args.get("space",""), "time": request.args.get("time","")}
+        eco = compute_eco_overlay(g.cfg, surv, {"agent":filt["agent"], "space":filt["space"], "time_index":filt["time"]})
+        cst = cost_stamp(g.cfg, "km", 1)  # reuse same cost bucket for now
+
+        # plots
+        import plotly.graph_objects as go
+        Rf = go.Figure([go.Scatter(x=eco["R_curve"]["t"], y=eco["R_curve"]["R"], mode="lines+markers", name="R(t)")])
+        Rf.update_layout(title="Resource Survivorship R(t)", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+        Ef = go.Figure([go.Scatter(x=eco["E_curve"]["t"], y=eco["E_curve"]["E"], mode="lines+markers", name="E(t)")])
+        Ef.update_layout(title="Ecosystemicity E(t)", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+        R_html = Rf.to_html(full_html=False, include_plotlyjs="cdn")
+        E_html = Ef.to_html(full_html=False, include_plotlyjs="cdn")
+
+        return render_template("eco.html",
+            title="Ecosystemicity",
+            brand=g.brand,
+            filters=filt,
+            cost=cst,
+            badges=eco["badges"],
+            R_plot=R_html,
+            E_plot=E_html
+        )
+
+    # ---------- API ----------
+    @app.get("/api/eco")
+    def api_eco():
+        surv = g.data.get("survival", pd.DataFrame())
+        filt = {"agent": request.args.get("agent",""), "space": request.args.get("space",""), "time_index": request.args.get("time","")}
+        eco = compute_eco_overlay(g.cfg, surv, filt)
+        return jsonify({"client": g.client_id, "filters": filt, **eco})
+
+    @app.get("/healthz")
+    def healthz():
+        return jsonify({"ok": True, "client": getattr(g, "client_id", None)})
+
+    return app
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT","5001")), debug=True)
+```
+
+---
+
+# 4) Config additions (extend any `config/clients/<client>.yml`)
+
+Append this block (values are sane defaults; tune per client):
+
+```yaml
+intelligence:
+  mode: plant            # plant | animal | hybrid
+  plant:
+    energy_budget_kwh: 100.0
+    recycle_ratio: 0.35
+    diversity_index_min: 0.45
+    lag_benefit_days: 60
+  animal:
+    peak_power_kw: 50.0
+    throughput_target: 1000
+    leakage_penalty: 0.15
+    time_to_output_days: 7
+
+ecosystemicity:
+  alpha: 0.4  # recursion depth weight
+  beta:  0.35 # recycle weight
+  gamma: 0.25 # diversity/connectivity weight
+
+thresholds:
+  R_min: 0.6
+  E_min: 0.6
+```
+
+---
+
+# 5) Run
+
+```bash
+# if you already have the venv/env:
+source ../env/bin/activate
+
+# add services + template
+mkdir -p services templates
+# (paste files above)
+
+python app.py
+# open:
+#   http://127.0.0.1:5001/km
+#   http://127.0.0.1:5001/eco
+# or multi-tenant path:
+#   http://127.0.0.1:5001/c/ukubona/eco
+```
+
+---
+
+This ships **Animal vs Plant** into the twin:
+
+* **Animal** gets you flashy S(t) now, but you see R/E decay and “animal frontier.”
+* **Plant** rewards closed loops and patience: R/E stay above thresholds, Ξ rises, “plant frontier.”
+
+It’s not just philosophy; it’s **visible on-screen** per client, per scenario, per agent × space × time.
+
 # R
+
+Now, something ignorable from `claude.ai`
+
+I can see you want to build a Flask app that transforms healthcare from tedious study into engaging play - uniting the philosophical insights of Heraclitus and Nietzsche with your Ukubona vision system. Let me create a plan that redeems us from "Socratic tedium" and embraces the dynamic, aesthetic play you're envisioning.
+
+[claude](.)
+
+This plan transforms your theoretical framework into actionable Flask development, moving healthcare education from passive study into dynamic play. The five game modes map directly to your neuronal pentad (Faith → Ideology → Ops → Recursion), while the persona engine brings literary voices to clinical decision-making.
+
+The key insight: instead of reading *about* medical decisions, players *make* them in aesthetically rich, consequential environments. Each scenario becomes a form of performance art where clinical competence emerges through play rather than memorization.
+
+The Flask architecture supports both your existing design system and the new interactive elements needed for true gameplay. The Ukubona vision integration adds the video processing layer that makes medical imaging simulation possible.
+
+Want me to start building the Flask skeleton, or would you prefer to dive deeper into any specific aspect - perhaps the scenario engine or the persona voice transformations?
+# S 
+# 🎮 Ukubona Flask App: From Platonic Study to Heraclitean Play
+
+## The Vision: Healthcare as Sequential, Consequential Play
+
+Transform the sterile world of medical education from passive reading/writing into dynamic, interactive play that honors the tragic-comic wisdom of Sophocles and the flux-philosophy of Heraclitus.
+
+---
+
+## 🏗️ Architecture: Flask App Structure
+
+### Core Application (`app.py`)
+```
+ukubona-flask/
+├── app.py                 # Main Flask application
+├── requirements.txt       # Dependencies
+├── static/
+│   ├── css/
+│   │   ├── main.css      # Existing dark theme + game aesthetics
+│   │   └── game.css      # Interactive elements, animations
+│   ├── js/
+│   │   ├── shared.js     # Existing shared behaviors
+│   │   ├── game-engine.js # Scenario state management
+│   │   └── video-vision.js # Ukubona video integration
+│   └── img/
+│       ├── scenarios/    # Scenario imagery
+│       └── avatars/      # Role avatars
+├── templates/
+│   ├── base.html         # Base template with your design system
+│   ├── index.html        # Game selection hub
+│   ├── scenario.html     # Interactive scenario player
+│   └── results.html      # Outcome analysis
+└── game_logic/
+    ├── __init__.py
+    ├── scenarios.py      # Scenario definitions
+    ├── personas.py       # Character voice filters
+    └── outcomes.py       # Consequence engine
+```
+
+---
+
+## 🎭 The Game Modes: From Faith to Recursion
+
+### 1. **Faith Mode** (Entropy/Tactical)
+- **Random case generator**: Patients arrive with mysterious symptoms
+- **High uncertainty**: Limited information, time pressure
+- **Aesthetic**: Flickering lights, urgent sound design
+- **Philosophy**: Leap of faith decisions, embrace the unknown
+
+### 2. **Despair Mode** (Ritual/Weekly)
+- **Recurring scenarios**: Same patient, different days
+- **Bureaucratic obstacles**: Insurance denials, prior auth loops
+- **Aesthetic**: Kafka-esque waiting rooms, paperwork mountains
+- **Philosophy**: Navigate institutional tedium with dignity
+
+### 3. **Ideology Mode** (Strategic/Quarterly)
+- **Policy simulations**: Design healthcare systems
+- **Resource allocation**: Balance budgets vs. outcomes
+- **Aesthetic**: Clean dashboards, godlike perspective
+- **Philosophy**: Test your worldview against reality
+
+### 4. **Ops/Splice Mode** (Daily/Operational)
+- **Shift simulator**: Real-time clinic/hospital workflow
+- **Multi-tasking chaos**: Multiple patients, interruptions
+- **Aesthetic**: Fast-paced, overlapping interfaces
+- **Philosophy**: Beauty in the grind, flow states
+
+### 5. **Recursion Mode** (Existential/Play)
+- **Meta-scenarios**: Play as AI training on healthcare data
+- **Feedback loops**: Your choices affect future scenarios
+- **Aesthetic**: Fractal patterns, infinite mirrors
+- **Philosophy**: Eternal return, learning from consequences
+
+---
+
+## 🧠 The Persona Engine: Literary Voices for Medical Care
+
+Transform clinical communication through literary filters:
+
+### Voice Transformations
+- **Hamlet**: "To screen or not to screen, that is the question..."
+- **Fortinbras**: "Immediate action. ECG now. Guard against delay."
+- **Jane Austen**: "It is a truth universally acknowledged that a patient in possession of chest pain must be in want of a thorough evaluation."
+- **Hemingway**: "Pain started yesterday. No radiation. Vitals stable. We wait."
+- **Toni Morrison**: "The body remembers what the mind forgets. Listen to what it's telling you."
+
+---
+
+## 🌊 Flask Routes: The Navigation System
+
+### Core Routes
+```python
+@app.route('/')
+def index():
+    """Game selection hub - choose your mode and avatar"""
+    
+@app.route('/game/<mode>')
+def game_mode(mode):
+    """Enter specific game mode (faith/despair/ideology/ops/recursion)"""
+    
+@app.route('/scenario/<scenario_id>')
+def play_scenario(scenario_id):
+    """Interactive scenario player with branching paths"""
+    
+@app.route('/api/respond', methods=['POST'])
+def ai_respond():
+    """AJAX endpoint for real-time chat responses"""
+    
+@app.route('/outcomes/<session_id>')
+def view_outcomes(session_id):
+    """Analyze decisions and consequences"""
+    
+@app.route('/ukubona-vision')
+def video_integration():
+    """Video vision processing for medical imaging simulation"""
+```
+
+### Data Flow
+1. **Player selects**: Mode + Avatar + Scenario
+2. **Game engine**: Generates dynamic patient cases
+3. **Persona filter**: Applies literary voice to medical guidance
+4. **Consequence tracking**: Records decisions for analysis
+5. **Ukubona vision**: Processes medical imagery/video
+6. **Outcome synthesis**: Shows parallel timelines, "what-if" branches
+
+---
+
+## 🎨 Aesthetic Design: Beyond Platonic Forms
+
+### Visual Philosophy
+- **Heraclitean flux**: Animated backgrounds, flowing particles
+- **Sophoclean tragedy**: Dramatic lighting, high contrast
+- **Nietzschean aesthetics**: Bold typography, dynamic interfaces
+- **Anti-Platonic**: No static forms, everything in motion
+
+### UI Components
+- **Breathing interfaces**: Subtle animation cycles
+- **Consequential colors**: Choices trigger color cascades
+- **Temporal rhythms**: Different modes have different pacing
+- **Fractal depth**: Zoom into molecular → systemic views
+
+---
+
+## 🔬 Technical Implementation
+
+### Phase 1: Core Game Engine (2-3 weeks)
+```python
+# Example scenario structure
+class Scenario:
+    def __init__(self, patient_profile, clinical_context):
+        self.patient = patient_profile
+        self.context = clinical_context
+        self.decision_tree = self.build_tree()
+        
+    def respond_as(self, persona, user_input):
+        medical_guidance = self.generate_guidance(user_input)
+        return PERSONAS[persona](medical_guidance)
+```
+
+### Phase 2: Ukubona Vision Integration (3-4 weeks)
+- Medical image simulation (X-rays, CT scans, etc.)
+- Real-time video processing for patient interaction
+- AI-assisted diagnostic gaming
+
+### Phase 3: Multiplayer Scenarios (4-5 weeks)
+- Multiple players take different roles simultaneously
+- Asynchronous decision consequences
+- Shared patient outcomes
+
+### Phase 4: Learning Analytics (2-3 weeks)
+- Track decision patterns across players
+- Generate personalized learning paths
+- Kaplan-Meier survival curves for different strategies
+
+---
+
+## 🎯 Success Metrics: Beyond Knowledge Transfer
+
+### Traditional Learning (What We're Escaping)
+- ❌ Hours spent reading
+- ❌ Multiple choice scores  
+- ❌ Memorized protocols
+
+### Playful Mastery (What We're Building)
+- ✅ **Flow states achieved**: Time spent in deep engagement
+- ✅ **Elegant decisions**: Solutions that balance multiple constraints
+- ✅ **Tragic wisdom**: Learning from beautiful failures
+- ✅ **Recursive improvement**: Players who return to replay scenarios
+- ✅ **Aesthetic appreciation**: Finding beauty in clinical complexity
+
+---
+
+## 🌍 Deployment Strategy
+
+### Infrastructure
+- **Flask + Gunicorn**: Core application server
+- **Redis**: Session management and real-time features
+- **PostgreSQL**: Scenario data, player progress
+- **WebRTC**: Video integration for Ukubona vision
+- **CDN**: Fast global delivery of game assets
+
+### Scaling Path
+1. **MVP**: Single-player scenarios, basic personas
+2. **Alpha**: Multiplayer, video integration
+3. **Beta**: AI-generated scenarios, learning analytics
+4. **Production**: Full Ukubona ecosystem integration
+
+---
+
+## 🎭 The Redemption: From Tedium to Transcendence
+
+### What Dies
+- Passive consumption of medical knowledge
+- Rote memorization of protocols
+- Fear-based defensive medicine
+- Disconnection between learning and beauty
+
+### What Lives
+- **Active creation** of medical understanding
+- **Aesthetic engagement** with clinical complexity  
+- **Playful mastery** of uncertainty and risk
+- **Collective wisdom** emerging from shared play
+
+### The Heraclitean Promise
+*"You cannot step into the same patient encounter twice"* - Every scenario is unique, every choice matters, every outcome teaches. The game becomes a living river of medical wisdom.
+
+---
+
+## 🚀 Next Steps
+
+1. **Set up Flask skeleton** with your existing design system
+2. **Build first scenario**: "To Screen or Not to Screen" 
+3. **Implement persona engine**: Literary voice transformations
+4. **Add video integration**: Ukubona vision processing
+5. **Deploy MVP**: Get it in players' hands for feedback
+
+The goal: Transform healthcare education from Platonic shadows on the cave wall into Nietzschean dance with reality itself. Every medical decision becomes an aesthetic choice, every clinical encounter a form of play that honors both the tragic complexity and comic absurdity of human care.
+
+Ready to build the future of medical education through play? 🎮⚡🌊
+# T
+# U
+# V
+# W
+# X
+# Y
+# Z
